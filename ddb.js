@@ -6,26 +6,27 @@ module.exports.initdb = initdb;
 module.exports.querydb = querydb;
 module.exports.getdb = getdb;
 module.exports.putdb = putdb;
-
+AWSdb.config.update({
+    region: "us-west-2",
+    endpoint: "http://dynamodb.us-west-2.amazonaws.com",
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    sessionToken: process.env.AWS_SESSION_TOKEN
+});
 function initdb(){
-    AWSdb.config.update({
-        region: "us-west-2",
-        endpoint: "http://dynamodb.us-west-2.amazonaws.com",
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        sessionToken: process.env.AWS_SESSION_TOKEN
-    });
+
     var dynamodb = new AWSdb.DynamoDB();
 
     var params = {
         TableName : "AlexaSkillHackathon",
         KeySchema: [
             { AttributeName: "FirstName", KeyType: "HASH"},  //Partition key
+            { AttributeName: "LastName", KeyType: "RANGE" },
+
         ],
         AttributeDefinitions: [
             { AttributeName: "FirstName", AttributeType: "S" },
             { AttributeName: "LastName", AttributeType: "S" },
-            { AttributeName: "RoomName", AttributeType: "S" },
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 1,
@@ -64,9 +65,12 @@ function getdb(table, pid, docClient, render){
     var params = {
         TableName: table,
         Key:{
-            "FirstName": pid
+            "FirstName": pid.split(" ")[0],
+            "LastName": pid.split(" ")[1]
         }
     };
+
+    console.log(params);
 
     docClient.get(params, function(err, data) {
         if (err) {
