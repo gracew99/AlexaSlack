@@ -20,3 +20,6 @@ Read the [Bolt documentation](https://slack.dev/bolt)
 -------------------
 
 \ ゜o゜)ノ
+
+https://glitch.com/edit/#!/remarkable-coral-click
+go to slack app intern-2020-workspace and /join-room firstname lastname
