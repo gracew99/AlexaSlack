@@ -7,7 +7,9 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "@slack/bolt": "^1.6.0"
+    "@slack/bolt": "^1.6.0",
+    "aws-sdk": "^2.724.0",
+    "uuid": "^8.3.0"
   },
   "engines": {
     "node": "11.x"
