@@ -20,7 +20,7 @@ const docClient = new AWSdb.DynamoDB.DocumentClient();
 const table = "AlexaSkillHackathon";
 const rooms = "Rooms";
 
-db.initdb();
+// db.initdb();
 
 // for (let i = 0; i < fnames.length; i++){
 //   db.putdb(table, chatName, fnames[i], lnames[i], docClient, function(data){
@@ -34,123 +34,123 @@ db.initdb();
 // }
 
 
-// app.event('app_home_opened', async ({ event, context }) => {
-//     try {
-//         /* view.publish is the method that your app uses to push a view to the Home tab */
-//         event_user = event.user;
+app.event('app_home_opened', async ({ event, context }) => {
+    try {
+        /* view.publish is the method that your app uses to push a view to the Home tab */
+        event_user = event.user;
 
-//         const result = await app.client.views.publish({
+        const result = await app.client.views.publish({
 
-//             /* retrieves your xoxb token from context */
-//             token: context.botToken,
+            /* retrieves your xoxb token from context */
+            token: context.botToken,
 
-//             /* the user that opened your app's app home */
-//             user_id: event.user,
+            /* the user that opened your app's app home */
+            user_id: event.user,
 
-//             /* the view object that appears in the app home*/
-//             view: {
-//                 type: 'home',
-//                 callback_id: 'home_view',
+            /* the view object that appears in the app home*/
+            view: {
+                type: 'home',
+                callback_id: 'home_view',
 
-//                 /* body of the view */
-//                 blocks: [
-//                     {
-//                         "type": "section",
-//                         "text": {
-//                             "type": "mrkdwn",
-//                             "text": "*Welcome to SuperTeam* :tada:"
-//                         }
-//                     },
-//                     {
-//                         "type": "divider"
-//                     },
-//                     {
-//                         "type": "section",
-//                         "text": {
-//                             "type": "mrkdwn",
-//                             "text": "Head on over to the Messages tab and send the /join-room message followed by your first and last name to join your SuperTeam! For example: /join-room Amazon Alexa"
-//                         }
-//                     }
-//                 ]
-//             }
-//         });
-//     }
-//     catch (error) {
-//         console.error(error);
-//     }
-// });
-
-
-
-// app.command('/create-room', async ({ ack, payload, context }) => {
-//     console.log(payload);
-//     // Calling ack() acknowledges the request coming from Slack
-//     ack();
-
-//     try {
-//         // Call the conversations.create method using the built-in WebClient
-//         const result = await app.client.conversations.create({
-//             // The token you used to initialize your app is stored in the `context` object
-//             token: context.botToken,
-//             // The name of the conversation
-//             name: chatName,
-
-//             is_private: false,
-
-//             // Add the botuser into the new channel
-//             user_ids: payload.user_id
-//         });
-        
-//         // addUserToRoom();
-//         console.log(result);
-
-//         const dbRoom = await db.putdbRooms(rooms, chatName, result.channel_id, docClient);
-//         console.log("dbRoom doesnt work bc promise" + dbRoom);
-//     }   
-//     catch (error) {
-//         console.error(error);
-//     }
-// });
-
-// let joinRoom = async (rmName, payload_text, context) =>{
-//     if (rmName === null){
-//         console.error('user does not exist');
-//         return null;
-//     }
-
-//     let slack_channel;
-
-//     if (rmName === chatName){
-//         slack_user_id = event_user;
-//         slack_channel = await db.getdbRooms(rooms, chatName, docClient);
-//         console.log("slackchannel doesnt work bc promise" + slack_channel);
-//     }
-//     console.log("channel " + slack_channel);
-//     console.log("user " + slack_user_id);
-
-//     try {
-//         // Call the conversations.create method using the built-in WebClient
-//         const result = await app.client.conversations.invite({
-//             // The token you used to initialize your app is stored in the `context` object
-//             token: context.botToken,
-//             // The name of the conversation
-//             channel: slack_channel,
-//             // Add the user who clicked the message action into the new channel
-//             users: slack_user_id
-//         });
-
-//         console.log(result);
-//     }
-//     catch (error) {
-//         console.error(error);
-//     }
-// }
+                /* body of the view */
+                blocks: [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*Welcome to SuperTeam* :tada:"
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "Head on over to the Messages tab and send the /join-room message followed by your first and last name to join your SuperTeam! For example: /join-room Amazon Alexa"
+                        }
+                    }
+                ]
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
 
 
-// app.command('/join-room', async ({ ack, payload, context }) => {
-//     ack();
-//     await db.getdb(table, payload.text, docClient, joinRoom, context);
-// });
+
+app.command('/create-room', async ({ ack, payload, context }) => {
+    console.log(payload);
+    // Calling ack() acknowledges the request coming from Slack
+    ack();
+
+    try {
+        // Call the conversations.create method using the built-in WebClient
+        const result = await app.client.conversations.create({
+            // The token you used to initialize your app is stored in the `context` object
+            token: context.botToken,
+            // The name of the conversation
+            name: chatName,
+
+            is_private: false,
+
+            // Add the botuser into the new channel
+            user_ids: payload.user_id
+        });
+
+        // addUserToRoom();
+        console.log(result);
+        console.log(result.channel_id);
+        const dbRoom = await db.putdbRooms(rooms, chatName, result.channel_id, docClient);
+        console.log("dbRoom doesnt work bc promise" + dbRoom);
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
+
+let joinRoom = async (rmName, payload_text, context) =>{
+    if (rmName === null){
+        console.error('user does not exist');
+        return null;
+    }
+
+    let slack_channel;
+
+    if (rmName === chatName){
+        slack_user_id = event_user;
+        slack_channel = await db.getdbRooms(rooms, chatName, docClient);
+        console.log("slackchannel doesnt work bc promise" + slack_channel);
+    }
+    console.log("channel " + slack_channel);
+    console.log("user " + slack_user_id);
+
+    try {
+        // Call the conversations.create method using the built-in WebClient
+        const result = await app.client.conversations.invite({
+            // The token you used to initialize your app is stored in the `context` object
+            token: context.botToken,
+            // The name of the conversation
+            channel: slack_channel,
+            // Add the user who clicked the message action into the new channel
+            users: slack_user_id
+        });
+
+        console.log(result);
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+
+
+app.command('/join-room', async ({ ack, payload, context }) => {
+    ack();
+    await db.getdb(table, payload.text, docClient, joinRoom, context);
+});
 
 
 

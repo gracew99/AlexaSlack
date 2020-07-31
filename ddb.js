@@ -6,6 +6,10 @@ module.exports.initdb = initdb;
 module.exports.querydb = querydb;
 module.exports.getdb = getdb;
 module.exports.putdb = putdb;
+module.exports.putdbRooms = putdbRooms;
+module.exports.getdbRooms = getdbRooms;
+
+
 AWSdb.config.update({
     region: "us-west-2",
     endpoint: "http://dynamodb.us-west-2.amazonaws.com",
@@ -18,7 +22,6 @@ function initdb(){
     var dynamodb = new AWSdb.DynamoDB();
 
     var params = {
-      {
         TableName : "AlexaSkillHackathon",
         KeySchema: [
             { AttributeName: "FirstName", KeyType: "HASH"},  //Partition key
@@ -33,20 +36,19 @@ function initdb(){
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1
         },
-    },{
-        TableName : "Rooms",
-        KeySchema: [
-            { AttributeName: "RoomName", KeyType: "HASH"},  //Partition key
-        ],
-        AttributeDefinitions: [
-            { AttributeName: "RoomName", AttributeType: "S" },
-        ],
-        ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1
-        }
-    }
     };
+
+    // TableName : "Rooms",
+    //         KeySchema: [
+    //             { AttributeName: "RoomName", KeyType: "HASH"},  //Partition key
+    //         ],
+    //         AttributeDefinitions: [
+    //             { AttributeName: "RoomName", AttributeType: "S" },
+    //         ],
+    //         ProvisionedThroughput: {
+    //             ReadCapacityUnits: 1,
+    //             WriteCapacityUnits: 1
+    //         }
 
     dynamodb.createTable(params, function(err, data) {
         if (err) {
