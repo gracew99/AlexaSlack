@@ -11,9 +11,9 @@ const app = new App({
         commands: '/slack/command'
     }
 });
-let fname = 'Grace';
-let lname = 'Alexander';
-let chatName = 'LP1';
+let fnames = ['Grace', 'Alexa', 'John', 'Mark', 'Matthew', 'Luke', 'Peter', 'Martha', 'Paul', 'Mary', 'Esther'];
+let lnames = ['Thomas', 'Larson', 'Spokes', 'Pilar', 'Slaz', 'Beshe', 'Bolan', 'Min', 'Kruger', 'Nore', 'Manerston'];
+let chatName = 'party';
 let slack_user_id;
 let event_user;
 let slack_channel_id;
@@ -21,14 +21,16 @@ const docClient = new AWSdb.DynamoDB.DocumentClient();
 const table = "AlexaSkillHackathon";
 // db.initdb();
 //
-// db.putdb(table, chatName, fname, lname, docClient, function(data){
-//     if (data === null){
-//         console.log('error')
-//     }
-//     else{
-//         console.log(data);
-//     }
-// });
+// for (let i = 0; i < fnames.length; i++){
+//   db.putdb(table, chatName, fnames[i], lnames[i], docClient, function(data){
+//       if (data === null){
+//           console.log('error')
+//       }
+//       else{
+//           console.log(data);
+//       }
+//   });
+// }
 
 app.event('app_home_opened', async ({ event, context }) => {
     try {
@@ -89,7 +91,7 @@ app.command('/create-room', async ({ ack, payload, context }) => {
             // The token you used to initialize your app is stored in the `context` object
             token: context.botToken,
             // The name of the conversation
-            name: "public-channel",
+            name: chatName,
 
             is_private: false,
 
@@ -97,7 +99,7 @@ app.command('/create-room', async ({ ack, payload, context }) => {
             user_ids: payload.user_id
         });
 
-        slack_channel_id = "C0EAQDV4Z";
+        slack_channel_id = result.channel_id;
 
         // addUserToRoom();
         console.log(result);
@@ -111,8 +113,8 @@ app.command('/create-room', async ({ ack, payload, context }) => {
 app.command('/join-room', async ({ ack, payload, context }) => {
     ack();
     var rmName = await db.getdb(table, payload.text, docClient, (data) => {
-      console.log('result:');
-      console.log(data);
+        console.log('result:');
+        console.log(data);
     });
     console.log(rmName);
     if (rmName === chatName){
@@ -158,6 +160,7 @@ app.command('/join-room', async ({ ack, payload, context }) => {
 
     console.log('⚡️ Bolt app is running!');
 })();
+
 
 
 

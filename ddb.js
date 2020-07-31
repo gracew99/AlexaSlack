@@ -93,7 +93,8 @@ function putdb(table, chatName, fname, lname, docClient, render){
     var params = {
         TableName:table,
         Item:{
-            "Name": fname + " " + lname,
+            "FirstName": fname,
+            "LastName": lname,
             "RoomName": chatName,
         }
     };
