@@ -74,10 +74,11 @@ function getdb(table, pid, docClient, render){
 
     docClient.get(params, function(err, data) {
         if (err) {
-            render(null);
+            return null;
             console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
         } else {
-            render(data);
+            render(data.Item.RoomName);
+            return data.Item.RoomName;
             console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
         }
     });
@@ -92,8 +93,7 @@ function putdb(table, chatName, fname, lname, docClient, render){
     var params = {
         TableName:table,
         Item:{
-            "FirstName": fname,
-            "LastName": lname,
+            "Name": fname + " " + lname,
             "RoomName": chatName,
         }
     };

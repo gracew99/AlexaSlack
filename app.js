@@ -110,21 +110,20 @@ app.command('/create-room', async ({ ack, payload, context }) => {
 
 app.command('/join-room', async ({ ack, payload, context }) => {
     ack();
-    let rmName;
-    var getPerson = await db.getdb(table, payload.text, docClient, (data) => {
-        console.log(data.RoomName);
-        rmName = data.RoomName;
-        if (rmName === chatName){
-            slack_channel_id = "C0180ED3EBX";
-        }
-        if (payload.text.split[0] === fname && payload.text.split[1] === lname){
-            slack_user_id = event_user;
-        }
-        console.log(slack_channel_id);
-
-        console.log(slack_user_id);
+    var rmName = await db.getdb(table, payload.text, docClient, (data) => {
+      console.log('result:');
+      console.log(data);
     });
+    console.log(rmName);
+    if (rmName === chatName){
+        slack_channel_id = "C0180ED3EBX";
+    }
+    if (payload.text.split[0] === fname && payload.text.split[1] === lname){
+        slack_user_id = event_user;
+    }
+    console.log(slack_channel_id);
 
+    console.log(slack_user_id);
     try {
         // Call the conversations.create method using the built-in WebClient
         const result = await app.client.conversations.invite({
