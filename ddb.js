@@ -18,6 +18,7 @@ function initdb(){
     var dynamodb = new AWSdb.DynamoDB();
 
     var params = {
+      {
         TableName : "AlexaSkillHackathon",
         KeySchema: [
             { AttributeName: "FirstName", KeyType: "HASH"},  //Partition key
@@ -31,7 +32,20 @@ function initdb(){
         ProvisionedThroughput: {
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1
+        },
+    },{
+        TableName : "Rooms",
+        KeySchema: [
+            { AttributeName: "RoomName", KeyType: "HASH"},  //Partition key
+        ],
+        AttributeDefinitions: [
+            { AttributeName: "RoomName", AttributeType: "S" },
+        ],
+        ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
         }
+    }
     };
 
     dynamodb.createTable(params, function(err, data) {
@@ -61,7 +75,7 @@ function querydb(table, docClient, render){
 }
 
 
-function getdb(table, pid, docClient, render){
+function getdb(table, pid, docClient, callback, context){
     var params = {
         TableName: table,
         Key:{
@@ -74,11 +88,29 @@ function getdb(table, pid, docClient, render){
 
     docClient.get(params, function(err, data) {
         if (err) {
-            return null;
+            callback(null, null, null);
             console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
         } else {
-            render(data.Item.RoomName);
-            return data.Item.RoomName;
+            callback(data.Item.RoomName, pid, context);
+            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+        }
+    });
+}
+
+function getdbRooms(table, chatName, docClient){
+    var params = {
+        TableName: table,
+        Key:{
+            "RoomName": chatName
+        }
+    };
+
+    console.log(params);
+
+    docClient.get(params, function(err, data) {
+        if (err) {
+            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
             console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
         }
     });
@@ -107,6 +139,32 @@ function putdb(table, chatName, fname, lname, docClient, render){
         }
         else{
             render(true);
+            console.log("Added item:", JSON.stringify(data, null, 2));
+        }
+
+    });
+}
+
+function putdbRooms(table, chatName, chatCode, docClient){
+    // if (typeof variable == 'undefined') {
+    //     id = uuidv4();
+    //     modified_id = id;
+    // }
+    // console.log(id + " " + modified_id);
+    var params = {
+        TableName:table,
+        Item:{
+            "RoomName": chatName,
+            "RoomCode": chatCode,
+        }
+    };
+
+    console.log("Adding a new item...");
+    docClient.put(params, function(err, data) {
+        if (err) {
+            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+        }
+        else{
             console.log("Added item:", JSON.stringify(data, null, 2));
         }
 
