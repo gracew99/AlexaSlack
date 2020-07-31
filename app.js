@@ -102,9 +102,7 @@ app.command('/create-room', async ({ ack, payload, context }) => {
         });
 
         // addUserToRoom();
-        console.log(result);
-        console.log(result.channel_id);
-        const dbRoom = await db.putdbRooms(rooms, chatName, result.channel_id, docClient);
+        const dbRoom = await db.putdbRooms(rooms, chatName, result.channel.id, docClient);
         console.log("dbRoom doesnt work bc promise" + dbRoom);
     }
     catch (error) {
@@ -112,7 +110,7 @@ app.command('/create-room', async ({ ack, payload, context }) => {
     }
 });
 
-let joinRoom = async (rmName, payload_text, context) =>{
+let joinRoom = async (rmName, payload_text, user_id, context) =>{
     if (rmName === null){
         console.error('user does not exist');
         return null;
@@ -121,35 +119,41 @@ let joinRoom = async (rmName, payload_text, context) =>{
     let slack_channel;
 
     if (rmName === chatName){
-        slack_user_id = event_user;
-        slack_channel = await db.getdbRooms(rooms, chatName, docClient);
+        await db.getdbRooms(rooms, chatName, docClient, async(data) =>
+        {
+            console.log(data.Item.RoomCode);
+            try {
+                // Call the conversations.create method using the built-in WebClient
+                const result = await app.client.conversations.invite({
+                    // The token you used to initialize your app is stored in the `context` object
+                    token: context.botToken,
+                    // The name of the conversation
+                    channel: data.Item.RoomCode,
+                    // Add the user who clicked the message action into the new channel
+                    users: user_id
+                });
+
+                console.log(result);
+            }
+            catch (error) {
+                console.error(error);
+            }
+        });
         console.log("slackchannel doesnt work bc promise" + slack_channel);
     }
-    console.log("channel " + slack_channel);
-    console.log("user " + slack_user_id);
+    console.log("user " + user_id);
 
-    try {
-        // Call the conversations.create method using the built-in WebClient
-        const result = await app.client.conversations.invite({
-            // The token you used to initialize your app is stored in the `context` object
-            token: context.botToken,
-            // The name of the conversation
-            channel: slack_channel,
-            // Add the user who clicked the message action into the new channel
-            users: slack_user_id
-        });
 
-        console.log(result);
-    }
-    catch (error) {
-        console.error(error);
-    }
 }
 
 
 app.command('/join-room', async ({ ack, payload, context }) => {
     ack();
-    await db.getdb(table, payload.text, docClient, joinRoom, context);
+    console.log('joining room');
+    console.log(payload);
+    console.log('context');
+    console.log(context);
+    await db.getdb(table, payload.text, docClient, joinRoom, payload.user_id, context);
 });
 
 
@@ -165,6 +169,7 @@ app.command('/join-room', async ({ ack, payload, context }) => {
 
     console.log('⚡️ Bolt app is running!');
 })();
+
 
 
 

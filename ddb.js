@@ -77,7 +77,7 @@ function querydb(table, docClient, render){
 }
 
 
-function getdb(table, pid, docClient, callback, context){
+function getdb(table, pid, docClient, callback, user_id, context){
     var params = {
         TableName: table,
         Key:{
@@ -93,13 +93,13 @@ function getdb(table, pid, docClient, callback, context){
             callback(null, null, null);
             console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
         } else {
-            callback(data.Item.RoomName, pid, context);
+            callback(data.Item.RoomName, pid, user_id, context);
             console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
         }
     });
 }
 
-function getdbRooms(table, chatName, docClient){
+function getdbRooms(table, chatName, docClient, callback){
     var params = {
         TableName: table,
         Key:{
@@ -113,6 +113,7 @@ function getdbRooms(table, chatName, docClient){
         if (err) {
             console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
         } else {
+            callback(data);
             console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
         }
     });
